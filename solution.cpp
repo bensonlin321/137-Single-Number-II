@@ -37,15 +37,56 @@ public:
         return 0;
     }
 
-    // 
-    int singleNumber_no_extra_memory(std::vector<int>& nums) {
+    /*
+        example: [1,3,1,3,7,1,3]
+
+        |value||     bits      |
+           1    0 0 0 0 0 0 0 1
+           3    0 0 0 0 0 0 1 1
+           1    0 0 0 0 0 0 0 1
+           3    0 0 0 0 0 0 1 1
+           7    0 0 0 0 0 1 1 1
+           1    0 0 0 0 0 0 0 1
+           3    0 0 0 0 0 0 1 1
+        ------------------------
+                          | | |
+                          | | |-> column 1, number of 1 is 7, can not be divided by 3  => the column 1 of answer is 1
+                          | |---> colume 2, number of 1 is 4, can not be divided by 3  => the column 2 of answer is 1
+                          |-----> colume 2, number of 1 is 1, can not be divided by 3  => the column 3 of answer is 1
         
-        return 0;
+        ans :   0 0 0 0 0 1 1 1
+        _______________________
+                         dec: 7
+    */
+    int singleNumber_no_extra_memory(std::vector<int>& nums) {
+        int ans = 0;
+
+        // max bit is 32
+        for(int i = 0; i < 32; i++) {
+            int count = 0;
+            printf("===============\n");
+            // number value
+            for (int j = 0; j < nums.size(); j++) {
+                // calculate the number of "1" in each row
+                if (( (nums[j] >> i) & 1 ) == 1) {
+                    count++;
+                }
+
+                printf("%d\n", (nums[j] >> i) & 1);
+            }
+            printf("===============\n");
+            // check if the number of "1" can be divided by 3
+            if (count % 3 != 0) {
+                ans = ans | (1 << i);
+            }
+            printf("[%d] %d %d %d %d %d\n", i, (ans >> 4) & 1, (ans >> 3) & 1, (ans >> 2) & 1, (ans >> 1) & 1, (ans >> 0) & 1);
+        }
+        return ans;
     }
 };
 
 int main(int argc, char *argv[]) {
     Solution *s = new Solution();
-    std::vector<int> nums{2,2,9,2,5,5,5,17,17,17};
-    printf("output:%d\n", s -> singleNumber(nums));
+    std::vector<int> nums{1,3,1,3,7,1,3};
+    printf("output:%d\n", s -> singleNumber_no_extra_memory(nums));
 }
